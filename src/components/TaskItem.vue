@@ -103,7 +103,7 @@ const toggleComplete = (id, status, event) => {
   transition: background 0.2s;
 }
 
-.task-checkbox.completed {
+.completed {
   text-decoration: line-through;
   color: green;
   border-color: green;
