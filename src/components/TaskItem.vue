@@ -1,8 +1,8 @@
 <template>
-  <div class="task-item">
+  <div class="task-item" @click="router.push(`/vue-todo-list/${item.id}`)">
     <div
         :class="['task-checkbox', {completed: item.complete}]"
-        @click="toggleComplete(item.id, item.complete)"
+        @click="toggleComplete(item.id, item.complete, $event)"
     >
 
       <Icon icon="mdi:check" width="14px"
@@ -15,8 +15,8 @@
     <span class="task-date">{{ item.deadline }}</span>
 
     <div class="task-actions">
-      <button @click="emit('remove', item.id)">
-        <Icon icon="mdi:trash-can-outline" width="18px" />
+      <button @click="remove(item.id, $event)">
+        <Icon icon="mdi:trash-can-outline" width="18px"/>
       </button>
     </div>
   </div>
@@ -24,6 +24,7 @@
 
 <script setup>
 import {Icon} from "@iconify/vue";
+import {useRouter} from "vue-router";
 
 const emit = defineEmits(['remove', 'toggleComplete'])
 
@@ -34,7 +35,15 @@ defineProps({
   }
 })
 
-const toggleComplete = (id, status)=>{
+const remove = (id, event) => {
+  event.stopPropagation()
+  emit('remove', id)
+}
+
+const router = useRouter()
+
+const toggleComplete = (id, status, event) => {
+  event.stopPropagation()
   emit('toggleComplete', id, status)
 }
 
@@ -58,6 +67,7 @@ const toggleComplete = (id, status)=>{
 }
 
 .task-checkbox {
+  margin: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -65,7 +75,6 @@ const toggleComplete = (id, status)=>{
   height: 20px;
   border-radius: 50%;
   border: 2px solid #888;
-  margin-right: 12px;
   transition: border-color 0.3s ease-in-out;
   position: relative;
 }
@@ -85,7 +94,7 @@ const toggleComplete = (id, status)=>{
   transition: background 0.2s;
 }
 
-.completed{
+.completed {
   text-decoration: line-through;
   color: green;
   border-color: green;

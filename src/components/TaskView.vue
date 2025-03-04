@@ -98,46 +98,33 @@
         <button
             type="submit"
             class="task-form__btn task-form__btn--submit"
-            :disabled="isDisable"
             aria-label="Создать задачу"
         >
-          Создать задачу
-        </button>
-
-        <button
-            type="reset"
-            class="task-form__btn task-form__btn--reset"
-            @click="resetForm"
-            aria-label="Очистить форму"
-        >
-          Очистить
+          Сохранить
         </button>
       </div>
     </Form>
   </div>
 </template>
 
-
-
 <script setup>
-import {computed, ref} from "vue";
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 
-import {Form, Field, configure, defineRule, ErrorMessage, useForm} from "vee-validate";
+import {Form, Field, configure, defineRule, ErrorMessage} from "vee-validate";
 import {required} from "@vee-validate/rules";
 import {localize} from "@vee-validate/i18n";
 
 import {categories} from "../const/categories.js";
 import {priorities} from "../const/prioritites.js";
-
-import {createTask} from "../api/http.js";
+import {onMounted, reactive, ref} from "vue";
+import {updateTask} from "@/api/http.js";
+import axios from "axios";
 
 const router = useRouter()
+const route = useRoute()
 
 const categoriesList = categories
 const prioritiesList = priorities
-
-const {resetForm} = useForm()
 
 const defaultTask = Object.freeze({
   title: '',
@@ -147,25 +134,27 @@ const defaultTask = Object.freeze({
   priority: '',
 })
 
-const newTask = ref({...defaultTask})
+const taskId = ref(route.params.id)
+const newTask = reactive({...defaultTask})
+
+const getTask = async ()=>{
+  const {data} = await axios.get(`https://vue-todo-list-120e6-default-rtdb.firebaseio.com/tasks/${taskId}.json`)
+  console.log(data)
+  Object.assign(newTask, data)
+}
+
 
 const handleSubmit = async ()=>{
   try{
+    console.log(taskId)
+    await updateTask(taskId, newTask)
 
-    await createTask(newTask.value)
+    Object.assign(newTask, defaultTask)
 
-    Object.assign(newTask.value, defaultTask)
-
-    router.push('/vue-todo-list/')
+    await router.push('/vue-todo-list/')
 
   }catch(e){ console.log(e.message)}
 }
-
-const isDisable = computed(() => {
-  return Object.values(newTask.value).some(value => !value)
-      ||newTask.value.title.length <3
-      || newTask.value.description.length <10
-})
 
 defineRule('required', required);
 
@@ -182,6 +171,10 @@ configure({
       min10: 'Минимум 10 символов'
     }
   })
+})
+
+onMounted(()=>{
+  getTask()
 })
 </script>
 

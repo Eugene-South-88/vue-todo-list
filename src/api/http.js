@@ -59,3 +59,10 @@ export const toggleCompleteTask = async (id, status) => {
   })
   console.log('Статус проставлен:' + status)
 }
+
+export const updateTask = async(id, task)=>{
+  await axios.patch(`https://vue-todo-list-120e6-default-rtdb.firebaseio.com/tasks/${id}.json`,{
+    task
+  })
+  console.log('Задача изменена: ' + task)
+}

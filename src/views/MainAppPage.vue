@@ -3,10 +3,12 @@
     <h1>Мой Список Дел</h1>
     <div class="input-group">
       <button
-          class="button add-btn"
-          @click="router.push('/create')"
-      >Добавить
+          @click="router.push('/vue-todo-list/create')"
+              class="button add-btn"
+      >
+        Добавить
       </button>
+
     </div>
     <ul class="todo-list">
       <task-item
@@ -30,22 +32,21 @@ const router = useRouter()
 
 const tasksList = ref(tasks)
 
-const remove = async (id)=>{
-    tasksList.value = tasksList.value.filter(item => item.id === id)
-    await removeTask(id)
-    await loadTask()
+const remove = async (id) => {
+  // tasksList.value = tasksList.value.filter(item => item.id !== id)
+  await removeTask(id)
+  await loadTask()
 }
 
-const toggleComplete = async (id, status)=>{
+const toggleComplete = async (id, status) => {
   // tasksList.value.complete[id] = !status
-  status = !status
-  await toggleCompleteTask(id, status)
+  await toggleCompleteTask(id, !status)
   await loadTask()
 }
 
 
-onMounted(() => {
-  loadTask()
+onMounted(async () => {
+  tasksList.value = await loadTask()
 })
 </script>
 
@@ -75,6 +76,8 @@ h1 {
   margin-bottom: 30px;
 }
 
+
+/* Анимации */
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -96,9 +99,33 @@ h1 {
   }
 }
 
+/* Адаптивность */
+@media (max-width: 768px) {
+  .container {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .add-btn {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .input-group {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .todo-item {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px;
+  }
+}
+
 @media (max-width: 480px) {
   .container {
-    padding: 20px;
+    padding: 15px;
     border-radius: 10px;
   }
 
@@ -108,15 +135,18 @@ h1 {
 
   .input-group {
     flex-direction: column;
+    gap: 8px;
   }
 
   .add-btn {
-    padding: 15px;
     width: 100%;
+    padding: 15px;
   }
 
   .todo-item {
-    padding: 12px;
+    font-size: 14px;
+    padding: 10px;
   }
 }
+
 </style>
