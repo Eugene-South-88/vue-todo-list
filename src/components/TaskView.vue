@@ -134,7 +134,7 @@ const defaultTask = Object.freeze({
   priority: '',
 })
 
-const taskId = ref(route.params.id)
+const taskId = route.params.id
 const newTask = reactive({...defaultTask})
 
 const getTask = async ()=>{
