@@ -4,7 +4,7 @@
         class="button min"
         @click="router.push('/vue-todo-list/')"
     >Назад</button>
-    <h2 class="task-form__title">Создать задачу</h2>
+    <h2 class="task-form__title">Просмотр</h2>
     <Form class="task-form__form" @submit="handleSubmit" role="form" aria-labelledby="task-form-title">
       <div class="task-form__input-group">
         <label for="task-title" class="task-form__label" id="task-form-title">Заголовок</label>
@@ -116,9 +116,8 @@ import {localize} from "@vee-validate/i18n";
 
 import {categories} from "../const/categories.js";
 import {priorities} from "../const/prioritites.js";
-import {onMounted, reactive, ref} from "vue";
-import {updateTask} from "@/api/http.js";
-import axios from "axios";
+import {onMounted, reactive} from "vue";
+import {updateTask, getTask} from "@/api/http.js";
 
 const router = useRouter()
 const route = useRoute()
@@ -137,10 +136,11 @@ const defaultTask = Object.freeze({
 const taskId = route.params.id
 const newTask = reactive({...defaultTask})
 
-const getTask = async ()=>{
-  const {data} = await axios.get(`https://vue-todo-list-120e6-default-rtdb.firebaseio.com/tasks/${taskId}.json`)
-  console.log(data)
-  Object.assign(newTask, data)
+const get = async ()=>{
+
+  const taskData = await getTask(taskId)
+
+  Object.assign(newTask, taskData)
 }
 
 
@@ -149,10 +149,9 @@ const handleSubmit = async ()=>{
     console.log(taskId)
     await updateTask(taskId, newTask)
 
-    Object.assign(newTask, defaultTask)
-
     await router.push('/vue-todo-list/')
 
+    Object.assign(newTask, defaultTask)
   }catch(e){ console.log(e.message)}
 }
 
@@ -174,7 +173,7 @@ configure({
 })
 
 onMounted(()=>{
-  getTask()
+  get()
 })
 </script>
 
@@ -245,11 +244,6 @@ onMounted(()=>{
   color: white;
 }
 
-.task-form__btn--reset {
-  background-color: #f44336;
-  color: white;
-}
-
 .task-form__btn:hover {
   opacity: 0.9;
 }
@@ -303,8 +297,7 @@ onMounted(()=>{
     align-items: center;
   }
 
-  .task-form__btn--submit,
-  .task-form__btn--reset {
+  .task-form__btn--submit{
     width: 100%;
     margin-bottom: 10px;
   }
@@ -346,8 +339,7 @@ onMounted(()=>{
     padding: 6px;
   }
 
-  .task-form__btn--submit,
-  .task-form__btn--reset {
+  .task-form__btn--submit{
     width: 100%;
   }
 

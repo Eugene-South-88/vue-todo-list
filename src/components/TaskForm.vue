@@ -156,7 +156,7 @@ const handleSubmit = async ()=>{
 
     Object.assign(newTask.value, defaultTask)
 
-    router.push('/vue-todo-list/')
+    await router.push('/vue-todo-list/')
 
   }catch(e){ console.log(e.message)}
 }

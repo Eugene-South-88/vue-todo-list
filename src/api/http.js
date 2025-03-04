@@ -17,7 +17,7 @@ export const createTask = async (task) => {
   }
 }
 
-export const loadTask = async (t) => {
+export const loadTask = async () => {
   try {
     console.log('Загрузка задач')
     const {data} = await axios.get(
@@ -61,8 +61,11 @@ export const toggleCompleteTask = async (id, status) => {
 }
 
 export const updateTask = async(id, task)=>{
-  await axios.patch(`https://vue-todo-list-120e6-default-rtdb.firebaseio.com/tasks/${id}.json`,{
-    task
-  })
+  await axios.patch(`https://vue-todo-list-120e6-default-rtdb.firebaseio.com/tasks/${id}.json`,task)
   console.log('Задача изменена: ' + task)
+}
+
+export const getTask = async (id)=>{
+  const {data} = await axios.get(`https://vue-todo-list-120e6-default-rtdb.firebaseio.com/tasks/${id}.json`)
+  return data
 }

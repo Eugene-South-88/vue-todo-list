@@ -31,7 +31,16 @@ const emit = defineEmits(['remove', 'toggleComplete'])
 defineProps({
   item: {
     type: Object,
-    required: true
+    required: true,
+    validator(value) {
+      // Проверка структуры объекта
+      return (
+          typeof value.id === 'string' &&
+          typeof value.title === 'string' &&
+          typeof value.complete === 'boolean' &&
+          typeof value.deadline === 'string'
+      );
+    }
   }
 })
 
@@ -94,7 +103,7 @@ const toggleComplete = (id, status, event) => {
   transition: background 0.2s;
 }
 
-.completed {
+.task-checkbox.completed {
   text-decoration: line-through;
   color: green;
   border-color: green;
