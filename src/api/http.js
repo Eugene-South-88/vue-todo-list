@@ -54,18 +54,18 @@ export const removeTask = async (id) => {
 }
 
 export const toggleCompleteTask = async (id, status) => {
-  await axios.patch(`https://vue-todo-list-120e6-default-rtdb.firebaseio.com/tasks/${id}.json`,{
+  await axios.patch(`https://vue-todo-list-120e6-default-rtdb.firebaseio.com/tasks/${id}.json`, {
     complete: status
   })
   console.log('Статус проставлен:' + status)
 }
 
-export const updateTask = async(id, task)=>{
-  await axios.patch(`https://vue-todo-list-120e6-default-rtdb.firebaseio.com/tasks/${id}.json`,task)
+export const updateTask = async (id, task) => {
+  await axios.patch(`https://vue-todo-list-120e6-default-rtdb.firebaseio.com/tasks/${id}.json`, task)
   console.log('Задача изменена: ' + task)
 }
 
-export const getTask = async (id)=>{
+export const getTask = async (id) => {
   const {data} = await axios.get(`https://vue-todo-list-120e6-default-rtdb.firebaseio.com/tasks/${id}.json`)
   return data
 }

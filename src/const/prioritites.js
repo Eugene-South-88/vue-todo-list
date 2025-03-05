@@ -1,5 +1,6 @@
 export const priorities = [
-  {label: 'Низкий', value: 'low'},
-  {label: 'Средний', value: 'medium'},
+  {label: 'Срочный', value: 'veryHigh'},
   {label: 'Высокий', value: 'high'},
+  {label: 'Средний', value: 'medium'},
+  {label: 'Низкий', value: 'low'},
 ]

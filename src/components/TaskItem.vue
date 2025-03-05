@@ -11,7 +11,9 @@
     </div>
 
     <span :class="['task-title', {completed: item.complete}]">{{ item.title }}</span>
-
+    <span>
+      <Icon class="icon" :icon="filterIcon" width="20" :ssr="true"/>
+    </span>
     <span class="task-date">{{ item.deadline }}</span>
 
     <div class="task-actions">
@@ -25,10 +27,11 @@
 <script setup>
 import {Icon} from "@iconify/vue";
 import {useRouter} from "vue-router";
+import {computed, onMounted} from "vue";
 
 const emit = defineEmits(['remove', 'toggleComplete'])
 
-defineProps({
+const props = defineProps({
   item: {
     type: Object,
     required: true,
@@ -56,6 +59,16 @@ const toggleComplete = (id, status, event) => {
   emit('toggleComplete', id, status)
 }
 
+
+const filterIcon = computed(()=>{
+  if (props.item.priority === 'veryHigh'){return 'mdi:chevron-double-up'}
+  if (props.item.priority === 'high'){return 'line-md:chevron-small-up'}
+  if (props.item.priority === 'medium'){return 'ic:round-minus'}
+  if (props.item.priority === 'low'){return 'mdi:chevron-down'}
+})
+
+onMounted(()=>{
+})
 </script>
 
 <style lang="css" scoped>

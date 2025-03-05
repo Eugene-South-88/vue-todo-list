@@ -4,15 +4,18 @@
     <div class="input-group">
       <button
           @click="router.push('/vue-todo-list/create')"
-              class="button add-btn"
+          class="button add-btn"
       >
         Добавить
       </button>
 
     </div>
+    <chips
+        @select-chip="updateSelectedChips"
+    />
     <ul class="todo-list">
       <task-item
-          v-for="item in tasksList"
+          v-for="item in itemFiltered"
           :key="item.id"
           :item="item"
           @remove="remove(item.id)"
@@ -24,22 +27,49 @@
 
 <script setup>
 import {useRouter} from "vue-router";
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {toggleCompleteTask, loadTask, removeTask, tasks} from "../api/http.js";
 import TaskItem from "../components/TaskItem.vue";
+import Chips from "@/components/chips.vue";
 
 const router = useRouter()
 
 const tasksList = ref(tasks)
 
+const selectedChips = ref([]);
+
+const updateSelectedChips = (newSelectedChips) => {
+  selectedChips.value = newSelectedChips;
+  console.log(selectedChips.value)
+};
+
+
+const itemFiltered = computed(() => {
+  if (selectedChips.value.length === 0) {
+    return tasksList.value;
+  }
+
+  const selectedChipsSet = new Set(selectedChips.value);
+
+  const filterTasks = (task) => {
+    return selectedChipsSet.has(task.priority) || selectedChipsSet.has(task.category);
+  };
+
+
+  return tasksList.value.filter(filterTasks);
+});
+
 const remove = async (id) => {
-  // tasksList.value = tasksList.value.filter(item => item.id !== id)
-  await removeTask(id)
-  await loadTask()
+  const passwordAlert = prompt()
+  if (passwordAlert === '2003') {
+
+    await removeTask(id)
+    await loadTask()
+  }
+  console.log('Неверный пароль')
 }
 
 const toggleComplete = async (id, status) => {
-  // tasksList.value.complete[id] = !status
   await toggleCompleteTask(id, !status)
   await loadTask()
 }
