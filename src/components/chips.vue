@@ -1,13 +1,13 @@
 <template>
   <div class="chip-container">
     <div
-        v-for="(priority, index) in priorities"
+        v-for="(priority, index) in PRIORITIES_LIST"
         :key="index"
         :class="['chip', {'active': activeChip.includes(priority.value)}]"
         tabindex="0"
         @click="selectChip(priority.value)"
     >
-      <Icon class="icon" :icon="filterIconPriorities(priority.value)" width="20" :ssr="true"/>
+      <Icon class="icon" :icon="PRIORITIES_ICONS[priority.value]" width="20"/>
       <span>
         {{ priority.label }}
       </span>
@@ -16,13 +16,13 @@
 
   <div class="chip-container">
     <div
-        v-for="(category, index) in categories"
+        v-for="(category, index) in CATEGORIES_LIST"
         :key="index"
         :class="['chip', {'active': activeChip.includes(category.value)}]"
         tabindex="0"
         @click="selectChip(category.value)"
     >
-      <Icon class="icon" :icon="filterIconCategories(category.value)" width="20" :ssr="true"/>
+      <Icon class="icon" icon="ic:baseline-question-mark" width="20"/>
       <span>
         {{ category.label }}
       </span>
@@ -31,34 +31,16 @@
 </template>
 
 <script setup>
+import { ref } from "vue";
 import {Icon} from "@iconify/vue";
-import {priorities} from "@/const/prioritites.js";
-import {categories} from "@/const/categories.js";
-import {computed, onMounted, ref} from "vue";
+
+import {PRIORITIES_LIST} from "@/const/prioritites.js";
+import {CATEGORIES_LIST} from "@/const/categories.js";
+import {PRIORITIES_ICONS} from "@/const/prioritiesIcons.js";
 
 const emit = defineEmits(['selectChip'])
 
-const filterIconPriorities = (value) => {
-  if (value === 'veryHigh') {
-    return 'mdi:chevron-double-up'
-  }
-  if (value === 'high') {
-    return 'mdi:chevron-up'
-  }
-  if (value === 'medium') {
-    return 'ic:round-minus'
-  }
-  if (value === 'low') {
-    return 'mdi:chevron-down'
-  }
-}
-
-const filterIconCategories = () => {
-  return 'ic:baseline-question-mark'
-}
-
 const activeChip = ref([])
-
 
 const selectChip = (chip) => {
   if (activeChip.value.includes(chip)) {
@@ -71,12 +53,6 @@ const selectChip = (chip) => {
     return true
   }
 }
-
-
-
-onMounted(() => {
-  filterIconPriorities()
-})
 </script>
 
 <style lang="css" scoped>

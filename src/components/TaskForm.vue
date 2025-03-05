@@ -3,7 +3,8 @@
     <button
         class="button min"
         @click="router.push('/vue-todo-list/')"
-    >Назад</button>
+    >Назад
+    </button>
     <h2 class="task-form__title">Создать задачу</h2>
     <Form class="task-form__form" @submit="handleSubmit" role="form" aria-labelledby="task-form-title">
       <div class="task-form__input-group">
@@ -62,7 +63,7 @@
           <option value="">Выберите категорию</option>
           <option
               :value="item.value"
-              v-for="(item, index) in categoriesList"
+              v-for="(item, index) in CATEGORIES_LIST"
               :key="index"
           >
             {{ item.label }}
@@ -85,7 +86,7 @@
           <option value="">Выберите приоритет</option>
           <option
               :value="item.value"
-              v-for="item in prioritiesList"
+              v-for="item in PRIORITIES_LIST"
               :key="item.value"
           >
             {{ item.label }}
@@ -98,7 +99,7 @@
         <button
             type="submit"
             class="task-form__btn task-form__btn--submit"
-            :disabled="isDisable"
+            :disabled="submitButtonDisabled"
             aria-label="Создать задачу"
         >
           Создать задачу
@@ -118,26 +119,17 @@
 </template>
 
 
-
 <script setup>
 import {computed, ref} from "vue";
 import {useRouter} from "vue-router";
 
 import {Form, Field, configure, defineRule, ErrorMessage, useForm} from "vee-validate";
-import {required} from "@vee-validate/rules";
 import {localize} from "@vee-validate/i18n";
 
-import {categories} from "../const/categories.js";
-import {priorities} from "../const/prioritites.js";
-
-import {createTask} from "../api/http.js";
-
-const router = useRouter()
-
-const categoriesList = categories
-const prioritiesList = priorities
-
-const {resetForm} = useForm()
+import {CATEGORIES_LIST} from "@/const/categories.js";
+import {PRIORITIES_LIST} from "@/const/prioritites.js";
+import {createTask} from "@/api/tasks.js";
+import {required} from "@vee-validate/rules";
 
 const defaultTask = Object.freeze({
   title: '',
@@ -145,26 +137,35 @@ const defaultTask = Object.freeze({
   deadline: '',
   category: '',
   priority: '',
-})
+});
+
+const router = useRouter();
+
+const {resetForm} = useForm();
 
 const newTask = ref({...defaultTask})
 
-const handleSubmit = async ()=>{
-  try{
+const handleSubmit = () => {
+  console.log('Задача создаётся');
+  const payload = {
+    ...newTask.value,
+    complete: false,
+  }
 
-    await createTask(newTask.value)
+  createTask(payload).then(() => {
+    Object.assign(newTask.value, defaultTask);
+    router.push('/vue-todo-list/');
 
-    Object.assign(newTask.value, defaultTask)
-
-    await router.push('/vue-todo-list/')
-
-  }catch(e){ console.log(e.message)}
+    console.log('Задача создана');
+  }).catch((e) => {
+    console.error("Ошибка при создании задачи:", e);
+  })
 }
 
-const isDisable = computed(() => {
+const submitButtonDisabled = computed(() => {
   return Object.values(newTask.value).some(value => !value)
-      ||newTask.value.title.length <3
-      || newTask.value.description.length <10
+      || newTask.value.title.length < 3
+      || newTask.value.description.length < 10
 })
 
 defineRule('required', required);
@@ -264,6 +265,7 @@ configure({
 .task-form__select {
   background-color: white;
 }
+
 .min {
   padding: 10px 20px;
   border-radius: 4px;

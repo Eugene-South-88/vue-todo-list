@@ -15,10 +15,10 @@
     />
     <ul class="todo-list">
       <task-item
-          v-for="item in itemFiltered"
+          v-for="item in filteredItems"
           :key="item.id"
           :item="item"
-          @remove="remove(item.id)"
+          @remove="handleRemove(item.id)"
           @toggle-complete="toggleComplete"
       />
     </ul>
@@ -26,57 +26,65 @@
 </template>
 
 <script setup>
-import {useRouter} from "vue-router";
 import {computed, onMounted, ref} from "vue";
-import {toggleCompleteTask, loadTask, removeTask, tasks} from "../api/http.js";
-import TaskItem from "../components/TaskItem.vue";
+import {useRouter} from "vue-router";
+import {toggleCompleteTask, removeTask, loadTasks} from "@/api/tasks.js";
+import {mapTasksResponse} from "@/api/mappers/tasks.js";
+
 import Chips from "@/components/chips.vue";
+import TaskItem from "@/components/TaskItem.vue";
 
-const router = useRouter()
+const router = useRouter();
 
-const tasksList = ref(tasks)
-
+const tasksList = ref([]);
 const selectedChips = ref([]);
 
 const updateSelectedChips = (newSelectedChips) => {
   selectedChips.value = newSelectedChips;
-  console.log(selectedChips.value)
 };
 
-
-const itemFiltered = computed(() => {
+const filteredItems = computed(() => {
   if (selectedChips.value.length === 0) {
     return tasksList.value;
   }
 
   const selectedChipsSet = new Set(selectedChips.value);
 
-  const filterTasks = (task) => {
+  return tasksList.value.filter((task) => {
     return selectedChipsSet.has(task.priority) || selectedChipsSet.has(task.category);
-  };
-
-
-  return tasksList.value.filter(filterTasks);
+  });
 });
 
-const remove = async (id) => {
-  const passwordAlert = prompt()
-  if (passwordAlert === '2003') {
+const fetchAllTasks = () => {
+  console.log('Загрузка задач');
 
-    await removeTask(id)
-    await loadTask()
+  loadTasks().then((res) => {
+    tasksList.value = mapTasksResponse(res.data);
+    console.log('Задачи загружены');
+  })
+};
+
+const handleRemove = async (id) => {
+  const passwordAlert = prompt();
+
+  if (passwordAlert === '2003') {
+    removeTask(id).then(() => {
+      fetchAllTasks();
+    })
+
+    return;
   }
   console.log('Неверный пароль')
 }
 
-const toggleComplete = async (id, status) => {
-  await toggleCompleteTask(id, !status)
-  await loadTask()
-}
+const toggleComplete = (id, status) => {
+  toggleCompleteTask(id, status).then(() => {
+    fetchAllTasks();
+  })
+};
 
-
-onMounted(async () => {
-  tasksList.value = await loadTask()
+onMounted(() => {
+  fetchAllTasks();
 })
 </script>
 

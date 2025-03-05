@@ -114,16 +114,16 @@ import {Form, Field, configure, defineRule, ErrorMessage} from "vee-validate";
 import {required} from "@vee-validate/rules";
 import {localize} from "@vee-validate/i18n";
 
-import {categories} from "../const/categories.js";
-import {priorities} from "../const/prioritites.js";
+import {CATEGORIES_LIST} from "@/const/categories.js";
+import {PRIORITIES_LIST} from "@/const/prioritites.js";
 import {onMounted, reactive} from "vue";
-import {updateTask, getTask} from "@/api/http.js";
+import {updateTask, getTask} from "@/api/tasks.js";
 
 const router = useRouter()
 const route = useRoute()
 
-const categoriesList = categories
-const prioritiesList = priorities
+const categoriesList = CATEGORIES_LIST
+const prioritiesList = PRIORITIES_LIST
 
 const defaultTask = Object.freeze({
   title: '',

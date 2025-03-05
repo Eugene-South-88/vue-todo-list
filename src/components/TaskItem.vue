@@ -2,22 +2,21 @@
   <div class="task-item" @click="router.push(`/vue-todo-list/${item.id}`)">
     <div
         :class="['task-checkbox', {completed: item.complete}]"
-        @click="toggleComplete(item.id, item.complete, $event)"
+        @click.stop="toggleComplete(item)"
     >
-
-      <Icon icon="mdi:check" width="14px"
-      />
-
+      <Icon icon="mdi:check" width="14px" />
     </div>
 
     <span :class="['task-title', {completed: item.complete}]">{{ item.title }}</span>
+
     <span>
-      <Icon class="icon" :icon="filterIcon" width="20" :ssr="true"/>
+      <Icon class="icon" :icon="filterIcon" width="20"/>
     </span>
+
     <span class="task-date">{{ item.deadline }}</span>
 
     <div class="task-actions">
-      <button @click="remove(item.id, $event)">
+      <button @click.stop="remove(item.id)">
         <Icon icon="mdi:trash-can-outline" width="18px"/>
       </button>
     </div>
@@ -25,49 +24,35 @@
 </template>
 
 <script setup>
-import {Icon} from "@iconify/vue";
+import {computed} from "vue";
 import {useRouter} from "vue-router";
-import {computed, onMounted} from "vue";
+import {Icon} from "@iconify/vue";
 
-const emit = defineEmits(['remove', 'toggleComplete'])
+const emit = defineEmits(['remove', 'toggleComplete']);
 
 const props = defineProps({
   item: {
     type: Object,
     required: true,
-    validator(value) {
-      // Проверка структуры объекта
-      return (
-          typeof value.id === 'string' &&
-          typeof value.title === 'string' &&
-          typeof value.complete === 'boolean' &&
-          typeof value.deadline === 'string'
-      );
-    }
   }
-})
+});
 
-const remove = (id, event) => {
-  event.stopPropagation()
-  emit('remove', id)
+const router = useRouter();
+
+const remove = (id) => {
+  emit('remove', id);
 }
 
-const router = useRouter()
-
-const toggleComplete = (id, status, event) => {
-  event.stopPropagation()
-  emit('toggleComplete', id, status)
+const toggleComplete = (item) => {
+  emit('toggleComplete', item.id, !item.status);
 }
 
-
+// табличный метод
 const filterIcon = computed(()=>{
   if (props.item.priority === 'veryHigh'){return 'mdi:chevron-double-up'}
   if (props.item.priority === 'high'){return 'line-md:chevron-small-up'}
   if (props.item.priority === 'medium'){return 'ic:round-minus'}
   if (props.item.priority === 'low'){return 'mdi:chevron-down'}
-})
-
-onMounted(()=>{
 })
 </script>
 
